@@ -1,5 +1,4 @@
 package DigitalPaymentServices;
-
 import javax.swing.*;
 import java.awt.Color;
 import java.awt.event.*;
@@ -17,7 +16,6 @@ public class GUI{
     public static boolean isLoggedIn = false;
 
     void frame(){
-
         //Initialization events
 
         JFrame window = new JFrame("Digital Payment Services");
@@ -73,7 +71,7 @@ public class GUI{
                 fileUser.writeFile(user.getText(), fileUser.userList);
                 filePass.writeFile(pass.getText(), filePass.passList);
                 Security.updateIndex(user.getText());
-                global.writeFile("0", global.balance);
+                System.out.println(Security.userIndex);
             }
         });
         loginButton.addActionListener(new ActionListener(){
@@ -83,9 +81,16 @@ public class GUI{
                 Security.password(user.getText(), pass.getText());
                 if(isLoggedIn==true){
                     global.balance = "./balance"+Security.userIndex+".txt";
-                    UpdateStats.updateBalance();
-                    global.readBalance(global.balance); 
-                    balanceLabel.setText("$"+global.balanceGlobal[0]); 
+                    try{
+                        UpdateStats.updateBalance();
+                        global.readBalance(global.balance);
+                        balanceLabel.setText("$"+global.balanceGlobal[0]); 
+                    }
+                    catch(ArrayIndexOutOfBoundsException E){
+                        global.writeFile("0", global.balance);
+                        UpdateStats.updateBalance();
+                        global.readBalance(global.balance);
+                    }
                     window.remove(login);
                     window.repaint();
                     window.add(banking);
@@ -125,10 +130,10 @@ class Security{
         updateIndex(login);
         if(pass.equals(GUI.filePass.output[userIndex])){
             GUI.isLoggedIn = true;
-            System.out.println("\nCorrect Password "+Security.userIndex);
+            System.out.println("\nCorrect Password "+Security.userIndex+" pass "+pass+" "+GUI.filePass.output[userIndex]);
         }
         else{
-            System.out.println("Incorrect Password");
+            System.out.println("Incorrect Password "+Security.userIndex+" pass "+pass+" "+GUI.filePass.output[userIndex]);
         }
     }
 }
