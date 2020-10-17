@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.Scanner;
 
 public class GUI{
-
     public static FileRW fileUser = new FileRW();
     public static FileRW filePass = new FileRW();
     public static FileRW global = new FileRW();
@@ -28,9 +27,11 @@ public class GUI{
         JButton loginButton = new JButton("Login");
         JButton registerButton = new JButton("Register");
         JButton deposit = new JButton("Deposit");
+        JButton withdraw = new JButton("Withdraw");
         JLabel amount = new JLabel("$");
         JLabel balanceLabel = new JLabel("$0");
-        int centerX = 800;
+        JLabel warnings = new JLabel();
+        int centerX = 500;
         int centerY = 550;
 
         user.setBounds(centerX/2 - 200/2,100,200,25);
@@ -48,23 +49,29 @@ public class GUI{
         login.setVisible(true);
         
         deposit.setBounds(centerX/2 - 100/2 + 60,200,100,50);
+        withdraw.setBounds(centerX/2 - 100/2 - 60,200,100,50);
         amountField.setBounds(centerX/2 - 200/2,100,200,25);
         amount.setBounds(centerX/2 - 200/2 - 25,100,100,25);
-        balanceLabel.setBounds(centerX/2 - 200/2,10,100,25);
+        balanceLabel.setBounds(centerX/2 - 100/2,10,100,25);
+        warnings.setBounds(centerX/2 - 200/2,70,250,25);
 
         banking.setBounds(0, 0, centerX, centerY);
         banking.setBackground(Color.lightGray);
         banking.setLayout(null);
         banking.add(deposit);
+        banking.add(withdraw);
         banking.add(amountField);
         banking.add(amount);
         banking.add(balanceLabel);
+        banking.add(warnings);
         banking.setVisible(true);
 
         window.setSize(centerX, centerY);
+        window.setLocationRelativeTo(null);
         window.setLayout(null);
         window.add(login);
         window.setVisible(true);
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         registerButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
@@ -80,7 +87,7 @@ public class GUI{
                 filePass.readFile(filePass.passList);
                 Security.password(user.getText(), pass.getText());
                 if(isLoggedIn==true){
-                    global.balance = "./balance"+Security.userIndex+".txt";
+                    global.balance = "./balances/balance"+Security.userIndex+".txt";
                     try{
                         UpdateStats.updateBalance();
                         global.readBalance(global.balance);
@@ -101,11 +108,43 @@ public class GUI{
         });
         deposit.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                String tempBal = Double.toString(Double.parseDouble(global.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
-                global.writeBalance(Security.userIndex, tempBal, global.balance);
-                System.out.println(global.balance);
-                UpdateStats.updateBalance();
-                balanceLabel.setText("$"+tempBal); 
+                try{
+                    if(Double.parseDouble(amountField.getText())>0){
+                        String tempBal = Double.toString(Double.parseDouble(global.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
+                        global.writeBalance(Security.userIndex, tempBal, global.balance);
+                        System.out.println(global.balance);
+                        UpdateStats.updateBalance();
+                        balanceLabel.setText("$"+tempBal);
+                        warnings.setText("");
+                    }
+                    else{
+                        warnings.setText("Error: Deposits must be greater than $0.");
+                    }
+                }
+                catch(NumberFormatException n){
+                    warnings.setText("Error: Deposits must an integer.");
+                }
+                window.repaint();
+            }
+        });
+        withdraw.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                try{
+                    if(Double.parseDouble(amountField.getText())>0){
+                        String tempBal = Double.toString(Double.parseDouble(global.balanceGlobal[0]) - Double.parseDouble(amountField.getText()));
+                        global.writeBalance(Security.userIndex, tempBal, global.balance);
+                        System.out.println(global.balance);
+                        UpdateStats.updateBalance();
+                        balanceLabel.setText("$"+tempBal);
+                        warnings.setText("");
+                    }
+                    else{
+                        warnings.setText("Error: Withdraws must be greater than $0.");
+                    }
+                }
+                catch(NumberFormatException n){
+                    warnings.setText("Error: Withdraws must an integer.");
+                }
                 window.repaint();
             }
         });

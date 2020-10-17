@@ -11,7 +11,7 @@ public class FileRW {
     public int i = 0;
     public String userList = "./credentials.txt";
     public String passList = "./passlist.txt";
-    public String balance = "./balance"+Security.userIndex+".txt";
+    public String balance = "./balances/balance"+Security.userIndex+".txt";
 
 
     void writeFile(String x, String path){
