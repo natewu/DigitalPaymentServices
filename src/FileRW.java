@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 public class FileRW {
+    //Public variables(Accessed from each object)
     public List<String> outputList = new ArrayList<String>();
     public String[] output = outputList.toArray(new String[0]);
     public List<String> balanceList = new ArrayList<String>();
@@ -12,7 +13,6 @@ public class FileRW {
     public String userList = "./credentials.txt";
     public String passList = "./passlist.txt";
     public String balance = "./balances/balance"+Security.userIndex+".txt";
-
 
     void writeFile(String x, String path){
         try{
@@ -48,16 +48,11 @@ public class FileRW {
             reader.close();
         }
         catch(Exception e){
-
         }
     }
     void writeBalance(int user, String bal, String path){
         try{
             FileWriter write = new FileWriter(path, false);
-            /* for(int i = 0; i<balanceGlobal.length; i++){
-                write.write(balanceGlobal[i] + System.getProperty("line.separator"));
-            } */
-            System.out.println(balance);
             write.write(bal + System.getProperty("line.separator"));
             write.flush();
             write.close();

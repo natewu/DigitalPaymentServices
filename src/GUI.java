@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.Scanner;
 
 public class GUI{
+    //Public variables with static variables that can be accessed globally.
     public static FileRW fileUser = new FileRW();
     public static FileRW filePass = new FileRW();
     public static FileRW global = new FileRW();
@@ -15,16 +16,19 @@ public class GUI{
     public static boolean isLoggedIn = false;
     boolean active = false;
 
+    //GUI Frame and panels
     JFrame window = new JFrame("Digital Payment Services");
     JPanel login = new JPanel();
     JPanel banking = new JPanel();
     JPanel transfer = new JPanel();
 
+    //Login panel elements
     JTextField userField = new JTextField();
     JTextField passField = new JTextField();
     JButton loginButton = new JButton("Login");
     JButton registerButton = new JButton("Register");
 
+    //Banking panel elements
     JTextField amountField = new JTextField();
     JButton deposit = new JButton("Deposit");
     JButton withdraw = new JButton("Withdraw");
@@ -34,18 +38,16 @@ public class GUI{
     JLabel warnings = new JLabel();
     JLabel userId = new JLabel("ID: ");
 
+    //Transfer panel elements
     JTextField idField = new JTextField();
     JButton sendFunds = new JButton("Transfer");
 
     void frame(){
         //Initialization events
-
-        
         int centerX = 400;
         int centerY = 550;
 
         //Login Panel
-        
         userField.setBounds(centerX/2 - 200/2,100,200,25);
         passField.setBounds(centerX/2 - 200/2,130,200,25);
         loginButton.setBounds(centerX/2 - 100/2 - 60,200,100,50);
@@ -61,7 +63,6 @@ public class GUI{
         login.setVisible(true);
         
         //Banking Panel
-        
         deposit.setBounds(centerX/2 - 105/2 + 55,200,105,50);
         withdraw.setBounds(centerX/2 - 105/2 - 55,200,105,50);
         send.setBounds(centerX/2 - 215/2,260,215,50);
@@ -86,7 +87,6 @@ public class GUI{
         
 
         //Transfer Panel
-       
         idField.setBounds(centerX/2 - 200/2,130,200,25);
         sendFunds.setBounds(centerX/2 - 100/2,200,100,50);
         transfer.setBounds(0, 0, centerX, centerY);
@@ -106,6 +106,7 @@ public class GUI{
         window.setVisible(true);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        //Button event listeners
         registerButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 fileUser.writeFile(userField.getText(), fileUser.userList);
@@ -193,13 +194,13 @@ public class GUI{
         this.pass = passField.getText();
     }
     
+    //Function to update balance
     void updateBalance(int id, String type){
         try{
             FileRW transferRW = new FileRW();
             transferRW.readBalance("./balances/balance"+id+".txt");
             switch(type){
                 case "Withdraw" , "Transfer":
-
                     if(Double.parseDouble(amountField.getText())>0 && Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
                         String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
                         global.writeBalance(id, tempBal, "./balances/balance"+id+".txt");
@@ -239,40 +240,4 @@ public class GUI{
         }
         window.repaint();
     }
-}
-class Security{
-    public static int userIndex = 0;
-    public static void updateIndex(String login){
-        try{
-            while(!login.equals(GUI.fileUser.output[userIndex])){
-                userIndex++;
-            }
-        }
-        catch(ArrayIndexOutOfBoundsException e){
-            System.out.println("User does not exist");
-        }
-    }
-    public static void password(String login, String pass){
-        updateIndex(login);
-        if(pass.equals(GUI.filePass.output[userIndex])){
-            GUI.isLoggedIn = true;
-            System.out.println("\nCorrect Password "+Security.userIndex+" pass "+pass+" "+GUI.filePass.output[userIndex]);
-        }
-        else{
-            System.out.println("Incorrect Password "+Security.userIndex+" pass "+pass+" "+GUI.filePass.output[userIndex]);
-        }
-    }
-}
-class UpdateStats{
-    static void refreshBalance(){
-        try{
-            FileRW updateBal = new FileRW();
-            updateBal.readFile(GUI.global.balance);
-            System.out.println("Balance: "+GUI.global.balanceGlobal[0]);
-            GUI.global.balanceGlobal[0] = updateBal.output[0];
-        }
-        catch(Exception e){
-        }
-    }
-    
 }
