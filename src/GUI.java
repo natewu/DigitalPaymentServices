@@ -32,6 +32,7 @@ public class GUI{
     JLabel amount = new JLabel("$");
     JLabel balanceLabel = new JLabel("$0");
     JLabel warnings = new JLabel();
+    JLabel userId = new JLabel("ID: ");
 
     JTextField idField = new JTextField();
     JButton sendFunds = new JButton("Transfer");
@@ -68,6 +69,7 @@ public class GUI{
         amount.setBounds(centerX/2 - 200/2 - 25,100,100,25);
         balanceLabel.setBounds(centerX/2 - 100/2,10,100,25);
         warnings.setBounds(centerX/2 - 200/2,70,300,25);
+        userId.setBounds(centerX/2 - 100/2,30,100,25);
 
         banking.setBounds(0, 0, centerX, centerY);
         banking.setBackground(Color.lightGray);
@@ -80,6 +82,7 @@ public class GUI{
         banking.add(amount);
         banking.add(balanceLabel);
         banking.add(warnings);
+        banking.add(userId);
         
 
         //Transfer Panel
@@ -122,6 +125,7 @@ public class GUI{
                         UpdateStats.refreshBalance();
                         global.readBalance(global.balance);
                         balanceLabel.setText("$"+global.balanceGlobal[0]); 
+                        userId.setText("ID: "+Security.userIndex);
                     }
                     catch(ArrayIndexOutOfBoundsException E){
                         global.writeFile("0", global.balance);
@@ -138,47 +142,11 @@ public class GUI{
         });
         deposit.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                try{
-                    if(Double.parseDouble(amountField.getText())>0){
-                        String tempBal = Double.toString(Double.parseDouble(global.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
-                        global.writeBalance(Security.userIndex, tempBal, global.balance);
-                        System.out.println(global.balance);
-                        UpdateStats.refreshBalance();
-                        balanceLabel.setText("$"+tempBal);
-                        warnings.setText("");
-                    }
-                    else{
-                        warnings.setText("Error: Deposits must be greater than $0.");
-                    }
-                }
-                catch(NumberFormatException n){
-                    warnings.setText("Error: Deposits must an integer.");
-                }
-                window.repaint();
+                updateBalance(Security.userIndex, "Deposit");
             }
         });
         withdraw.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                /* try{
-                    if(Double.parseDouble(amountField.getText())>0 && Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
-                        String tempBal = Double.toString(Double.parseDouble(global.balanceGlobal[0]) - Double.parseDouble(amountField.getText()));
-                        global.writeBalance(Security.userIndex, tempBal, global.balance);
-                        System.out.println(global.balance);
-                        UpdateStats.refreshBalance();
-                        balanceLabel.setText("$"+tempBal);
-                        warnings.setText("");
-                    }
-                    else if(Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
-                        warnings.setText("Error: Withdraws must be greater than $0.");
-                    }
-                    else{
-                        warnings.setText("Error: Withdraw greater than available funds.");
-                    }
-                }
-                catch(NumberFormatException n){
-                    warnings.setText("Error: Withdraws must an integer.");
-                }
-                window.repaint(); */
                 updateBalance(Security.userIndex, "Withdraw");
             }
         });
@@ -229,30 +197,41 @@ public class GUI{
         try{
             FileRW transferRW = new FileRW();
             transferRW.readBalance("./balances/balance"+id+".txt");
-            if(Double.parseDouble(amountField.getText())>0 && Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
-                String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
-                global.writeBalance(id, tempBal, "./balances/balance"+id+".txt");
-                switch(type){
-                    case "Withdraw" , "Transfer":
+            switch(type){
+                case "Withdraw" , "Transfer":
+
+                    if(Double.parseDouble(amountField.getText())>0 && Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
+                        String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
+                        global.writeBalance(id, tempBal, "./balances/balance"+id+".txt");
                         String tempTransfer = Double.toString(Double.parseDouble(global.balanceGlobal[0]) - Double.parseDouble(amountField.getText()));
                         global.writeBalance(Security.userIndex, tempTransfer, global.balance);
                         UpdateStats.refreshBalance();
                         balanceLabel.setText("$"+tempTransfer);
-                        break;
-                    case "Deposit":
+                        transferRW = null;
+                        warnings.setText("");
+                    }
+                    else if(Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
+                        warnings.setText("Error: "+type+"s must be greater than $0.");
+                    }
+                    else{
+                        warnings.setText("Error: "+type+"s greater than available funds.");
+                    }
+                    
+                    break;
+                case "Deposit":
+                    if(Double.parseDouble(amountField.getText())>0){
+                        String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
                         global.writeBalance(Security.userIndex, tempBal, global.balance);
                         UpdateStats.refreshBalance();
                         balanceLabel.setText("$"+tempBal);
-                        break;
-                }
-                transferRW = null;
-                warnings.setText("");
-            }
-            else if(Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
-                warnings.setText("Error: "+type+"s must be greater than $0.");
-            }
-            else{
-                warnings.setText("Error: "+type+"s greater than available funds.");
+                        transferRW = null;
+                        warnings.setText("");
+                    }
+                    else{
+                        warnings.setText("Error: "+type+"s must be greater than $0.");
+                    }
+                    
+                    break;
             }
         }
         catch(NumberFormatException n){
