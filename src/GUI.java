@@ -159,7 +159,7 @@ public class GUI{
         });
         withdraw.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                try{
+                /* try{
                     if(Double.parseDouble(amountField.getText())>0 && Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
                         String tempBal = Double.toString(Double.parseDouble(global.balanceGlobal[0]) - Double.parseDouble(amountField.getText()));
                         global.writeBalance(Security.userIndex, tempBal, global.balance);
@@ -178,7 +178,8 @@ public class GUI{
                 catch(NumberFormatException n){
                     warnings.setText("Error: Withdraws must an integer.");
                 }
-                window.repaint();
+                window.repaint(); */
+                updateBalance(Security.userIndex, "Withdraw");
             }
         });
         send.addActionListener(new ActionListener(){
@@ -216,7 +217,7 @@ public class GUI{
         });
         sendFunds.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                updateBalance(Integer.parseInt(idField.getText()), "withdraw");
+                updateBalance(Integer.parseInt(idField.getText()), "Transfer");
             }
         });
 
@@ -226,12 +227,25 @@ public class GUI{
     
     void updateBalance(int id, String type){
         try{
+            FileRW transferRW = new FileRW();
+            transferRW.readBalance("./balances/balance"+id+".txt");
             if(Double.parseDouble(amountField.getText())>0 && Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
-                String tempBal = Double.toString(Double.parseDouble(global.balanceGlobal[0]) - Double.parseDouble(amountField.getText()));
-                global.writeBalance("./balances/balance"+id+".txt", tempBal, global.balance);
-                System.out.println(global.balance);
-                UpdateStats.refreshBalance();
-                balanceLabel.setText("$"+tempBal);
+                String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
+                global.writeBalance(id, tempBal, "./balances/balance"+id+".txt");
+                switch(type){
+                    case "Withdraw" , "Transfer":
+                        String tempTransfer = Double.toString(Double.parseDouble(global.balanceGlobal[0]) - Double.parseDouble(amountField.getText()));
+                        global.writeBalance(Security.userIndex, tempTransfer, global.balance);
+                        UpdateStats.refreshBalance();
+                        balanceLabel.setText("$"+tempTransfer);
+                        break;
+                    case "Deposit":
+                        global.writeBalance(Security.userIndex, tempBal, global.balance);
+                        UpdateStats.refreshBalance();
+                        balanceLabel.setText("$"+tempBal);
+                        break;
+                }
+                transferRW = null;
                 warnings.setText("");
             }
             else if(Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
@@ -275,9 +289,6 @@ class UpdateStats{
         try{
             FileRW updateBal = new FileRW();
             updateBal.readFile(GUI.global.balance);
-            // while(Security.userIndex < GUI.global.output.length){
-            // }
-            // System.out.println("Balance: "+updateBal.output[Security.userIndex]);
             System.out.println("Balance: "+GUI.global.balanceGlobal[0]);
             GUI.global.balanceGlobal[0] = updateBal.output[0];
         }
