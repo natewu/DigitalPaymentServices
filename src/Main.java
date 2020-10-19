@@ -16,23 +16,30 @@ class Security{
     public static int userIndex = 0;
     public static void updateIndex(String login){
         try{
-            while(!login.equals(GUI.fileUser.output[userIndex])){
-                userIndex++;
-            }
+            for(userIndex = 0; !login.equals(GUI.fileUser.output[userIndex]); userIndex++);
         }
         catch(ArrayIndexOutOfBoundsException e){
             System.out.println("User does not exist");
+            GUI.incorrect = true;
         }
     }
     public static void password(String login, String pass){
-        updateIndex(login);
-        if(pass.equals(GUI.filePass.output[userIndex])){
-            GUI.isLoggedIn = true;
-            System.out.println("\nCorrect Password "+Security.userIndex+" pass "+pass+" "+GUI.filePass.output[userIndex]);
+        try{
+            updateIndex(login);
+            if(pass.equals(GUI.filePass.output[userIndex])){
+                GUI.isLoggedIn = true;
+                System.out.println("\nCorrect Password "+Security.userIndex+" pass "+pass+" "+GUI.filePass.output[userIndex]);
+            }
+            else{
+                GUI.incorrect = true;
+                System.out.println("Incorrect Password "+Security.userIndex+" pass "+pass+" "+GUI.filePass.output[userIndex]);
+            }
         }
-        else{
-            System.out.println("Incorrect Password "+Security.userIndex+" pass "+pass+" "+GUI.filePass.output[userIndex]);
+        catch(ArrayIndexOutOfBoundsException n){
+            updateIndex(login);
+            GUI.incorrect = true;
         }
+        
     }
 }
 //UpdateStats class manages balances and updates the displayed balance.
