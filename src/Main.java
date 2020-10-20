@@ -28,6 +28,7 @@ class Security{
             updateIndex(login);
             if(pass.equals(GUI.filePass.output[userIndex])){
                 GUI.isLoggedIn = true;
+                GUI.incorrect = false;
                 System.out.println("\nCorrect Password "+Security.userIndex+" pass "+pass+" "+GUI.filePass.output[userIndex]);
             }
             else{

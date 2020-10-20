@@ -27,17 +27,18 @@ public class GUI{
     //Login panel elements
     JLabel username = new JLabel("<html><p style: font-family:'Arial'; font-size: 14;>Username</p>");
     JLabel password = new JLabel("<html><p style: font-family:'Arial'; font-size: 14;>Password</p>");
+    JLabel incorrectJLabel = new JLabel();
     JTextField userField = new JTextField();
     JTextField passField = new JTextField();
     JButton loginButton = new JButton("Login");
     JButton registerButton = new JButton("Register");
-    JLabel incorrectJLabel = new JLabel();
 
     //Banking panel elements
     JTextField amountField = new JTextField();
     JButton deposit = new JButton("Deposit");
     JButton withdraw = new JButton("Withdraw");
     JButton send = new JButton("Transfer Money");
+    JButton logout = new JButton("Logout");
     JLabel amount = new JLabel("$");
     JLabel balanceLabel = new JLabel("Balance: $0");
     JLabel warnings = new JLabel();
@@ -78,6 +79,7 @@ public class GUI{
         deposit.setBounds(centerX/2 - 105/2 + 55,200,105,50);
         withdraw.setBounds(centerX/2 - 105/2 - 55,200,105,50);
         send.setBounds(centerX/2 - 215/2,260,215,50);
+        logout.setBounds(centerX/2 - 215/2,330,215,50);
         amountField.setBounds(centerX/2 - 200/2,100,200,25);
         amount.setBounds(centerX/2 - 200/2 - 25,100,100,25);
         balanceLabel.setBounds(centerX/2 - 200/2,30,200,25);
@@ -91,6 +93,7 @@ public class GUI{
         banking.add(deposit);
         banking.add(withdraw);
         banking.add(send);
+        banking.add(logout);
         banking.add(amountField);
         banking.add(amount);
         banking.add(balanceLabel);
@@ -138,6 +141,10 @@ public class GUI{
         send.setForeground(new Color(255,255,255));
         send.setBackground(new Color(83, 211, 209));
         send.setBorder(BorderFactory.createEmptyBorder());
+        logout.setFont(new Font("Arial", Font.BOLD, 15));
+        logout.setForeground(new Color(255,255,255));
+        logout.setBackground(new Color(83, 211, 209));
+        logout.setBorder(BorderFactory.createEmptyBorder());
         sendFunds.setFont(new Font("Arial", Font.BOLD, 15));
         sendFunds.setForeground(new Color(255,255,255));
         sendFunds.setBackground(new Color(83, 211, 209));
@@ -155,21 +162,24 @@ public class GUI{
         //Button event listeners
         registerButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
+                //Writes the data in user and password fields to their respective files.
                 fileUser.writeFile(userField.getText(), fileUser.userList);
                 filePass.writeFile(passField.getText(), filePass.passList);
+                //Updates the userindex
                 Security.updateIndex(userField.getText());
-                System.out.println(Security.userIndex);
             }
         });
         loginButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
+                //Reads the list of usernames and passwords to be compared by Security.password();
                 fileUser.readFile(fileUser.userList);
                 filePass.readFile(filePass.passList);
                 Security.password(userField.getText(), passField.getText());
+                //Checks for valid input
                 if(incorrect==true){
-                    System.out.println("Incorrect pass");
                     incorrectJLabel.setText("Incorrect username or password!");
                 }
+                //Validates if user is logged in before updating the window to show banking information
                 else if(isLoggedIn==true){
                     global.balance = "./balances/balance"+Security.userIndex+".txt";
                     try{
@@ -178,11 +188,15 @@ public class GUI{
                         balanceLabel.setText("Balance: $"+global.balanceGlobal[0]); 
                         userId.setText("User ID: "+Security.userIndex);
                     }
+                    //If user is newly registered, creates a file to store the user balance
                     catch(ArrayIndexOutOfBoundsException E){
                         global.writeFile("0", global.balance);
                         UpdateStats.refreshBalance();
                         global.readBalance(global.balance);
                     }
+                    warnings.setText("");
+                    incorrectJLabel.setText("");
+                    amountField.setText("");
                     window.remove(login);
                     window.repaint();
                     window.add(banking);
@@ -202,6 +216,7 @@ public class GUI{
         });
         send.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
+                //Switches between the banking and transfer panel, send(JButton) is a toggle, uses boolean to check toggle state
                 if(active==false){
                     window.remove(banking);
                     window.repaint();
@@ -211,6 +226,7 @@ public class GUI{
                     transfer.add(balanceLabel);
                     transfer.add(warnings);
                     transfer.add(userId);
+                    amountField.setText("");
                     send.setText("Back");
                     send.setBounds(centerX/2 - 100/2,260,100,50);
                     window.add(transfer);
@@ -226,6 +242,7 @@ public class GUI{
                     banking.add(balanceLabel);
                     banking.add(warnings);
                     banking.add(userId);
+                    amountField.setText("");
                     send.setText("Transfer Money");
                     send.setBounds(centerX/2 - 215/2,260,215,50);
                     window.add(banking);
@@ -235,9 +252,31 @@ public class GUI{
                 
             }
         });
+        //Logs the user out and clears the global user index to reset session
+        logout.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                isLoggedIn = false;
+                window.remove(banking);
+                window.repaint();
+                global = null;
+                global = new FileRW();
+                window.add(login);
+                window.validate();
+            }
+        });
+        //Sends the funds to the user ID specified
         sendFunds.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                updateBalance(Integer.parseInt(idField.getText()), "Transfer");
+                try{
+                    int id = Integer.parseInt(idField.getText());
+                    warnings.setText("");
+                    updateBalance(id, "Transfer");
+                }
+                catch(NumberFormatException n){
+                    if(idField.getText().isBlank()){
+                        warnings.setText("Error: Please enter user ID to be transferred to.");
+                    }
+                }
             }
         });
 
@@ -248,18 +287,21 @@ public class GUI{
     //Function to update balance
     void updateBalance(int id, String type){
         try{
+            //Constructor creates new object so the previous data is always cleared.
             FileRW transferRW = new FileRW();
             transferRW.readBalance("./balances/balance"+id+".txt");
+            //Switch statement allows to choose what should be performed
             switch(type){
                 case "Withdraw" , "Transfer":
+                    //Checks if user has enough balance before being withdrawn or transferred to another user and if the amoount is greater than 0.
                     if(Double.parseDouble(amountField.getText())>0 && Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
                         String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
-                        global.writeBalance(id, tempBal, "./balances/balance"+id+".txt");
+                        global.writeBalance(tempBal, "./balances/balance"+id+".txt");
                         String tempTransfer = Double.toString(Double.parseDouble(global.balanceGlobal[0]) - Double.parseDouble(amountField.getText()));
-                        global.writeBalance(Security.userIndex, tempTransfer, global.balance);
+                        global.writeBalance(tempTransfer, global.balance);
                         UpdateStats.refreshBalance();
                         balanceLabel.setText("Balance: $"+tempTransfer);
-                        transferRW = null;
+                        transferRW = null; // deletes data 
                         warnings.setText("");
                     }
                     else if(Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
@@ -271,12 +313,13 @@ public class GUI{
                     
                     break;
                 case "Deposit":
+                    //Check if the amount deposited is greater than 0.
                     if(Double.parseDouble(amountField.getText())>0){
                         String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
-                        global.writeBalance(Security.userIndex, tempBal, global.balance);
+                        global.writeBalance(tempBal, global.balance);
                         UpdateStats.refreshBalance();
                         balanceLabel.setText("Balance: $"+tempBal);
-                        transferRW = null;
+                        transferRW = null; // deletes data
                         warnings.setText("");
                     }
                     else{
@@ -286,9 +329,11 @@ public class GUI{
                     break;
             }
         }
+        //Displays error if user enters something other than a numerical value.
         catch(NumberFormatException n){
-            warnings.setText("Error: "+type+"s must an integer.");
+            warnings.setText("Error: "+type+"s must a numerical value.");
         }
+        //Refreshes window to display updated information
         window.repaint();
     }
 }

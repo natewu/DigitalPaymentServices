@@ -14,6 +14,7 @@ public class FileRW {
     public String passList = "./passlist.txt";
     public String balance = "./balances/balance"+Security.userIndex+".txt";
 
+    //Writes a specified string to a file from a determined path
     void writeFile(String x, String path){
         try{
             FileWriter write = new FileWriter(path, true);
@@ -23,6 +24,7 @@ public class FileRW {
         catch(IOException e){
         }
     }
+    //Reads file from a path
     void readFile(String path){
         try{
             BufferedReader reader = new BufferedReader(new FileReader(path));
@@ -37,6 +39,7 @@ public class FileRW {
 
         }
     }
+    //Reads and updates balance from a path
     void readBalance(String path){
         try{
             BufferedReader reader = new BufferedReader(new FileReader(path));
@@ -50,7 +53,8 @@ public class FileRW {
         catch(Exception e){
         }
     }
-    void writeBalance(int user, String bal, String path){
+    //Writes balances to a specified file from a path
+    void writeBalance(String bal, String path){
         try{
             FileWriter write = new FileWriter(path, false);
             write.write(bal + System.getProperty("line.separator"));
