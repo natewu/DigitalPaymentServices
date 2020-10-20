@@ -29,11 +29,9 @@ class Security{
             if(pass.equals(GUI.filePass.output[userIndex])){
                 GUI.isLoggedIn = true;
                 GUI.incorrect = false;
-                System.out.println("\nCorrect Password "+Security.userIndex+" pass "+pass+" "+GUI.filePass.output[userIndex]);
             }
             else{
                 GUI.incorrect = true;
-                System.out.println("Incorrect Password "+Security.userIndex+" pass "+pass+" "+GUI.filePass.output[userIndex]);
             }
         }
         catch(ArrayIndexOutOfBoundsException n){
