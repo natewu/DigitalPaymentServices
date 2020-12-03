@@ -46,7 +46,7 @@ class UpdateStats{
     static void refreshBalance(){
         try{
             FileRW updateBal = new FileRW();
-            updateBal.readFile(GUI.global.balance);
+            updateBal.read(GUI.global.balance);
             System.out.println("Balance: "+GUI.global.balanceGlobal[0]);
             GUI.global.balanceGlobal[0] = updateBal.output[0];
         }

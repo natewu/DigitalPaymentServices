@@ -4,14 +4,13 @@ import java.awt.Color;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-import java.util.Scanner;
 import java.awt.*;
 
 public class GUI{
     //Public variables with static variables that can be accessed globally.
     public static FileRW fileUser = new FileRW();
     public static FileRW filePass = new FileRW();
-    public static FileRW global = new FileRW();
+    public static BalanceRW global = new BalanceRW();
     public String user;
     public String pass;
     public static boolean isLoggedIn = false;
@@ -73,6 +72,7 @@ public class GUI{
         login.add(passField);
         login.add(registerButton);
         login.add(incorrectJLabel);
+        loginButton.setMnemonic(KeyEvent.VK_ENTER);
         login.setVisible(true);
         
         //Banking Panel
@@ -99,7 +99,6 @@ public class GUI{
         banking.add(balanceLabel);
         banking.add(warnings);
         banking.add(userId);
-        
 
         //Transfer Panel
         idField.setBounds(centerX/2 - 200/2,155,200,25);
@@ -163,8 +162,8 @@ public class GUI{
         registerButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 //Writes the data in user and password fields to their respective files.
-                fileUser.writeFile(userField.getText(), fileUser.userList);
-                filePass.writeFile(passField.getText(), filePass.passList);
+                fileUser.write(userField.getText(), fileUser.userList);
+                filePass.write(passField.getText(), filePass.passList);
                 //Updates the userindex
                 Security.updateIndex(userField.getText());
             }
@@ -172,8 +171,8 @@ public class GUI{
         loginButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 //Reads the list of usernames and passwords to be compared by Security.password();
-                fileUser.readFile(fileUser.userList);
-                filePass.readFile(filePass.passList);
+                fileUser.read(fileUser.userList);
+                filePass.read(filePass.passList);
                 Security.password(userField.getText(), passField.getText());
                 //Checks for valid input
                 if(incorrect==true){
@@ -184,15 +183,15 @@ public class GUI{
                     global.balance = "./balances/balance"+Security.userIndex+".txt";
                     try{
                         UpdateStats.refreshBalance();
-                        global.readBalance(global.balance);
+                        global.read(global.balance);
                         balanceLabel.setText("Balance: $"+global.balanceGlobal[0]); 
                         userId.setText("User ID: "+Security.userIndex);
                     }
                     //If user is newly registered, creates a file to store the user balance
                     catch(ArrayIndexOutOfBoundsException E){
-                        global.writeFile("0", global.balance);
+                        global.write("0", global.balance);
                         UpdateStats.refreshBalance();
-                        global.readBalance(global.balance);
+                        global.read(global.balance);
                     }
                     warnings.setText("");
                     incorrectJLabel.setText("");
@@ -259,7 +258,7 @@ public class GUI{
                 window.remove(banking);
                 window.repaint();
                 global = null;
-                global = new FileRW();
+                global = new BalanceRW();
                 window.add(login);
                 window.validate();
             }
@@ -288,17 +287,17 @@ public class GUI{
     void updateBalance(int id, String type){
         try{
             //Constructor creates new object so the previous data is always cleared.
-            FileRW transferRW = new FileRW();
-            transferRW.readBalance("./balances/balance"+id+".txt");
+            BalanceRW transferRW = new BalanceRW();
+            transferRW.read("./balances/balance"+id+".txt");
             //Switch statement allows to choose what should be performed
             switch(type){
                 case "Withdraw" , "Transfer":
                     //Checks if user has enough balance before being withdrawn or transferred to another user and if the amoount is greater than 0.
                     if(Double.parseDouble(amountField.getText())>0 && Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
                         String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
-                        global.writeBalance(tempBal, "./balances/balance"+id+".txt");
+                        global.write(tempBal, "./balances/balance"+id+".txt");
                         String tempTransfer = Double.toString(Double.parseDouble(global.balanceGlobal[0]) - Double.parseDouble(amountField.getText()));
-                        global.writeBalance(tempTransfer, global.balance);
+                        global.write(tempTransfer, global.balance);
                         UpdateStats.refreshBalance();
                         balanceLabel.setText("Balance: $"+tempTransfer);
                         transferRW = null; // deletes data 
@@ -316,7 +315,7 @@ public class GUI{
                     //Check if the amount deposited is greater than 0.
                     if(Double.parseDouble(amountField.getText())>0){
                         String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
-                        global.writeBalance(tempBal, global.balance);
+                        global.write(tempBal, global.balance);
                         UpdateStats.refreshBalance();
                         balanceLabel.setText("Balance: $"+tempBal);
                         transferRW = null; // deletes data
