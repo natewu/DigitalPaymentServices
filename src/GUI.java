@@ -154,6 +154,7 @@ public class GUI{
         window.setLocationRelativeTo(null);
         window.setLayout(null);
         window.add(login);
+        window.getRootPane().setDefaultButton(loginButton);
         window.setResizable(false);
         window.setVisible(true);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -248,7 +249,6 @@ public class GUI{
                     window.validate();
                     active = false;
                 }
-                
             }
         });
         //Logs the user out and clears the global user index to reset session
@@ -278,7 +278,6 @@ public class GUI{
                 }
             }
         });
-
         this.user = userField.getText();
         this.pass = passField.getText();
     }
@@ -309,7 +308,6 @@ public class GUI{
                     else{
                         warnings.setText("Error: "+type+"s greater than available funds.");
                     }
-                    
                     break;
                 case "Deposit":
                     //Check if the amount deposited is greater than 0.
@@ -324,7 +322,6 @@ public class GUI{
                     else{
                         warnings.setText("Error: "+type+"s must be greater than $0.");
                     }
-                    
                     break;
             }
         }
