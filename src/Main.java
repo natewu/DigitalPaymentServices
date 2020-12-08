@@ -14,16 +14,21 @@ public class Main {
 //Security class manages user login verification and user indexing.
 class Security{
     public static int userIndex = 0;
-    public static void updateIndex(String login){
+    public static boolean updateIndex(String login){
         try{
             for(userIndex = 0; !login.equals(GUI.fileUser.output[userIndex]); userIndex++);
+            return true;
         }
         catch(ArrayIndexOutOfBoundsException e){
             System.out.println("User does not exist");
             GUI.incorrect = true;
+            userIndex = 0;
+            return false;   
         }
     }
     public static void password(String login, String pass){
+        GUI.fileUser.read(GUI.fileUser.userList);
+        GUI.filePass.read(GUI.filePass.passList);
         try{
             updateIndex(login);
             if(pass.equals(GUI.filePass.output[userIndex])){
@@ -38,7 +43,6 @@ class Security{
             updateIndex(login);
             GUI.incorrect = true;
         }
-        
     }
 }
 //UpdateStats class manages balances and updates the displayed balance.

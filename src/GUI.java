@@ -28,7 +28,7 @@ public class GUI{
     JLabel password = new JLabel("<html><p style: font-family:'Arial'; font-size: 14;>Password</p>");
     JLabel incorrectJLabel = new JLabel();
     JTextField userField = new JTextField();
-    JTextField passField = new JTextField();
+    JPasswordField passField = new JPasswordField();
     JButton loginButton = new JButton("Login");
     JButton registerButton = new JButton("Register");
 
@@ -162,19 +162,28 @@ public class GUI{
         //Button event listeners
         registerButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                //Writes the data in user and password fields to their respective files.
-                fileUser.write(userField.getText(), fileUser.userList);
-                filePass.write(passField.getText(), filePass.passList);
-                //Updates the userindex
-                Security.updateIndex(userField.getText());
+                fileUser.read(fileUser.userList);
+                if(Security.updateIndex(userField.getText()) == false){
+                    //Writes the data in user and password fields to their respective files.
+                    fileUser.write(userField.getText(), fileUser.userList);
+                    char[] pass = passField.getPassword();
+                    String password = String.valueOf(pass);
+                    filePass.write(password, filePass.passList);
+                    incorrectJLabel.setText("Successfully Registered");
+                    //Updates the userindex
+                    Security.updateIndex(userField.getText());
+                }
+                else{
+                    incorrectJLabel.setText("User already exists!");
+                }
             }
         });
         loginButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 //Reads the list of usernames and passwords to be compared by Security.password();
-                fileUser.read(fileUser.userList);
-                filePass.read(filePass.passList);
-                Security.password(userField.getText(), passField.getText());
+                char[] pass = passField.getPassword();
+                String password = String.valueOf(pass);
+                Security.password(userField.getText(), password);
                 //Checks for valid input
                 if(incorrect==true){
                     incorrectJLabel.setText("Incorrect username or password!");
@@ -193,6 +202,9 @@ public class GUI{
                         global.write("0", global.balance);
                         UpdateStats.refreshBalance();
                         global.read(global.balance);
+                        balanceLabel.setText("Balance: $"+global.balanceGlobal[0]); 
+                        userId.setText("User ID: "+Security.userIndex);
+                        window.repaint();
                     }
                     warnings.setText("");
                     incorrectJLabel.setText("");
@@ -278,8 +290,6 @@ public class GUI{
                 }
             }
         });
-        this.user = userField.getText();
-        this.pass = passField.getText();
     }
     
     //Function to update balance

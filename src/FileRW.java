@@ -25,42 +25,17 @@ public class FileRW implements readWrite{
     // Reads file from a path
     public void read(String path) {
         try {
+            outputList.clear();
             BufferedReader reader = new BufferedReader(new FileReader(path));
             String temp;
-            while ((temp = reader.readLine()) != null) {
+            while((temp = reader.readLine()) != null){
                 outputList.add(temp);
             }
             output = outputList.toArray(new String[0]);
             reader.close();
         } catch (Exception e) {
-
         }
     }
-    // //Reads and updates balance from a path
-    // void readBalance(String path){
-    //     try{
-    //         BufferedReader reader = new BufferedReader(new FileReader(path));
-    //         String temp;
-    //         while ((temp = reader.readLine()) != null){
-    //             balanceList.add(temp);
-    //         }
-    //         balanceGlobal = balanceList.toArray(new String[0]);
-    //         reader.close();
-    //     }
-    //     catch(Exception e){
-    //     }
-    // }
-    // //Writes balances to a specified file from a path
-    // void writeBalance(String bal, String path){
-    //     try{
-    //         FileWriter write = new FileWriter(path, false);
-    //         write.write(bal + System.getProperty("line.separator"));
-    //         write.flush();
-    //         write.close();
-    //     }
-    //     catch(IOException e){
-    //     }
-    // }
 }
 class BalanceRW extends FileRW implements readWrite{
     public List<String> balanceList = new ArrayList<String>();
@@ -77,9 +52,10 @@ class BalanceRW extends FileRW implements readWrite{
     }
     public void read(String path){
         try{
+            balanceList.clear();
             BufferedReader reader = new BufferedReader(new FileReader(path));
             String temp;
-            while ((temp = reader.readLine()) != null){
+            while((temp = reader.readLine()) != null){
                 balanceList.add(temp);
             }
             balanceGlobal = balanceList.toArray(new String[0]);
