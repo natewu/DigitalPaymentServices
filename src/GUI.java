@@ -3,11 +3,12 @@ import javax.swing.*;
 import java.awt.Color;
 import java.awt.event.*;
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.awt.*;
 
-public class GUI{
-    //Public variables with static variables that can be accessed globally.
+public class GUI {
+    // Public variables with static variables that can be accessed globally.
     public static FileRW fileUser = new FileRW();
     public static FileRW filePass = new FileRW();
     public static BalanceRW global = new BalanceRW();
@@ -17,13 +18,13 @@ public class GUI{
     boolean active = false;
     static boolean incorrect = false;
 
-    //GUI Frame and panels
+    // GUI Frame and panels
     JFrame window = new JFrame("Digital Payment Services");
     JPanel login = new JPanel();
     JPanel banking = new JPanel();
     JPanel transfer = new JPanel();
 
-    //Login panel elements
+    // Login panel elements
     JLabel username = new JLabel("<html><p style: font-family:'Arial'; font-size: 14;>Username</p>");
     JLabel password = new JLabel("<html><p style: font-family:'Arial'; font-size: 14;>Password</p>");
     JLabel incorrectJLabel = new JLabel();
@@ -32,7 +33,7 @@ public class GUI{
     JButton loginButton = new JButton("Login");
     JButton registerButton = new JButton("Register");
 
-    //Banking panel elements
+    // Banking panel elements
     JTextField amountField = new JTextField();
     JButton deposit = new JButton("Deposit");
     JButton withdraw = new JButton("Withdraw");
@@ -43,24 +44,24 @@ public class GUI{
     JLabel warnings = new JLabel();
     JLabel userId = new JLabel("User ID: ");
 
-    //Transfer panel elements
+    // Transfer panel elements
     JTextField idField = new JTextField();
     JButton sendFunds = new JButton("Transfer");
     JLabel userIdLabel = new JLabel("User ID: ");
 
-    void frame(){
-        //Initialization events
+    void frame() {
+        // Initialization events
         int centerX = 400;
         int centerY = 500;
 
-        //Login Panel
-        username.setBounds(centerX/2 - 280/2,75,280,25);
-        incorrectJLabel.setBounds(centerX/2 - 280/2,50,280,25);
-        password.setBounds(centerX/2 - 280/2,130,280,25);
-        userField.setBounds(centerX/2 - 280/2,100,280,25);
-        passField.setBounds(centerX/2 - 280/2,155,280,25);
-        loginButton.setBounds(centerX/2 - 130/2 - 75,250,130,60);
-        registerButton.setBounds(centerX/2 - 130/2 + 75,250,130,60);
+        // Login Panel
+        username.setBounds(centerX / 2 - 280 / 2, 75, 280, 25);
+        incorrectJLabel.setBounds(centerX / 2 - 280 / 2, 50, 280, 25);
+        password.setBounds(centerX / 2 - 280 / 2, 130, 280, 25);
+        userField.setBounds(centerX / 2 - 280 / 2, 100, 280, 25);
+        passField.setBounds(centerX / 2 - 280 / 2, 155, 280, 25);
+        loginButton.setBounds(centerX / 2 - 130 / 2 - 75, 250, 130, 60);
+        registerButton.setBounds(centerX / 2 - 130 / 2 + 75, 250, 130, 60);
 
         login.setBounds(0, 0, centerX, centerY);
         login.setBackground(Color.white);
@@ -74,17 +75,17 @@ public class GUI{
         login.add(incorrectJLabel);
         loginButton.setMnemonic(KeyEvent.VK_ENTER);
         login.setVisible(true);
-        
-        //Banking Panel
-        deposit.setBounds(centerX/2 - 105/2 + 55,200,105,50);
-        withdraw.setBounds(centerX/2 - 105/2 - 55,200,105,50);
-        send.setBounds(centerX/2 - 215/2,260,215,50);
-        logout.setBounds(centerX/2 - 215/2,330,215,50);
-        amountField.setBounds(centerX/2 - 200/2,100,200,25);
-        amount.setBounds(centerX/2 - 200/2 - 25,100,100,25);
-        balanceLabel.setBounds(centerX/2 - 200/2,30,200,25);
-        warnings.setBounds(centerX/2 - 300/2,70,300,25);
-        userId.setBounds(centerX/2 - 100/2,420,100,25);
+
+        // Banking Panel
+        deposit.setBounds(centerX / 2 - 105 / 2 + 55, 200, 105, 50);
+        withdraw.setBounds(centerX / 2 - 105 / 2 - 55, 200, 105, 50);
+        send.setBounds(centerX / 2 - 215 / 2, 260, 215, 50);
+        logout.setBounds(centerX / 2 - 215 / 2, 330, 215, 50);
+        amountField.setBounds(centerX / 2 - 200 / 2, 100, 200, 25);
+        amount.setBounds(centerX / 2 - 200 / 2 - 25, 100, 100, 25);
+        balanceLabel.setBounds(centerX / 2 - 200 / 2, 30, 200, 25);
+        warnings.setBounds(centerX / 2 - 300 / 2, 70, 300, 25);
+        userId.setBounds(centerX / 2 - 100 / 2, 420, 100, 25);
 
         banking.setBounds(0, 0, centerX, centerY);
         banking.setBackground(Color.white);
@@ -100,10 +101,10 @@ public class GUI{
         banking.add(warnings);
         banking.add(userId);
 
-        //Transfer Panel
-        idField.setBounds(centerX/2 - 200/2,155,200,25);
-        sendFunds.setBounds(centerX/2 - 100/2,200,100,50);
-        userIdLabel.setBounds(centerX/2 - 100/2-50,120,100,50);
+        // Transfer Panel
+        idField.setBounds(centerX / 2 - 200 / 2, 155, 200, 25);
+        sendFunds.setBounds(centerX / 2 - 100 / 2, 200, 100, 50);
+        userIdLabel.setBounds(centerX / 2 - 100 / 2 - 50, 120, 100, 50);
         transfer.setBounds(0, 0, centerX, centerY);
         transfer.setBackground(Color.white);
         transfer.setLayout(null);
@@ -111,9 +112,9 @@ public class GUI{
 
         transfer.add(sendFunds);
         transfer.add(userIdLabel);
-        transfer.add(idField);        
+        transfer.add(idField);
 
-        //GUI Style
+        // GUI Style
         balanceLabel.setFont(new Font("Arial", Font.BOLD, 15));
         warnings.setFont(new Font("Serif", Font.PLAIN, 12));
         warnings.setForeground(Color.RED);
@@ -121,35 +122,35 @@ public class GUI{
         incorrectJLabel.setFont(new Font("Serif", Font.PLAIN, 12));
         userId.setFont(new Font("Arial", Font.BOLD, 14));
         loginButton.setFont(new Font("Arial", Font.BOLD, 15));
-        loginButton.setForeground(new Color(255,255,255));
+        loginButton.setForeground(new Color(255, 255, 255));
         loginButton.setBackground(new Color(83, 211, 209));
         loginButton.setBorder(BorderFactory.createEmptyBorder());
         registerButton.setFont(new Font("Arial", Font.BOLD, 15));
-        registerButton.setForeground(new Color(255,255,255));
+        registerButton.setForeground(new Color(255, 255, 255));
         registerButton.setBackground(new Color(83, 211, 209));
         registerButton.setBorder(BorderFactory.createEmptyBorder());
         deposit.setFont(new Font("Arial", Font.BOLD, 15));
-        deposit.setForeground(new Color(255,255,255));
+        deposit.setForeground(new Color(255, 255, 255));
         deposit.setBackground(new Color(83, 211, 209));
         deposit.setBorder(BorderFactory.createEmptyBorder());
         withdraw.setFont(new Font("Arial", Font.BOLD, 15));
-        withdraw.setForeground(new Color(255,255,255));
+        withdraw.setForeground(new Color(255, 255, 255));
         withdraw.setBackground(new Color(83, 211, 209));
         withdraw.setBorder(BorderFactory.createEmptyBorder());
         send.setFont(new Font("Arial", Font.BOLD, 15));
-        send.setForeground(new Color(255,255,255));
+        send.setForeground(new Color(255, 255, 255));
         send.setBackground(new Color(83, 211, 209));
         send.setBorder(BorderFactory.createEmptyBorder());
         logout.setFont(new Font("Arial", Font.BOLD, 15));
-        logout.setForeground(new Color(255,255,255));
+        logout.setForeground(new Color(255, 255, 255));
         logout.setBackground(new Color(83, 211, 209));
         logout.setBorder(BorderFactory.createEmptyBorder());
         sendFunds.setFont(new Font("Arial", Font.BOLD, 15));
-        sendFunds.setForeground(new Color(255,255,255));
+        sendFunds.setForeground(new Color(255, 255, 255));
         sendFunds.setBackground(new Color(83, 211, 209));
         sendFunds.setBorder(BorderFactory.createEmptyBorder());
 
-        //Main Frame
+        // Main Frame
         window.setSize(centerX, centerY);
         window.setLocationRelativeTo(null);
         window.setLayout(null);
@@ -159,31 +160,37 @@ public class GUI{
         window.setVisible(true);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //Button event listeners
-        registerButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
+        // Button event listeners
+        registerButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 fileUser.read(fileUser.userList);
-                if(Security.updateIndex(userField.getText()) == false){
-                    //Writes the data in user and password fields to their respective files.
+                if (Security.updateIndex(userField.getText()) == false) {
+                    // Writes the data in user and password fields to their respective files.
                     fileUser.write(userField.getText(), fileUser.userList);
                     char[] pass = passField.getPassword();
-                    String password = String.valueOf(pass);
-                    filePass.write(password, filePass.passList);
+                    try {
+                        filePass.write(Security.encode(String.valueOf(pass)), filePass.passList);
+                    } catch (NoSuchAlgorithmException e1) {
+                        e1.printStackTrace();
+                    }
                     incorrectJLabel.setText("Successfully Registered");
-                    //Updates the userindex
+                    // Updates the userindex
                     Security.updateIndex(userField.getText());
-                }
-                else{
+                } else {
                     incorrectJLabel.setText("User already exists!");
                 }
             }
         });
-        loginButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
-                //Reads the list of usernames and passwords to be compared by Security.password();
+        loginButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Reads the list of usernames and passwords to be compared by
+                // Security.password();
                 char[] pass = passField.getPassword();
-                String password = String.valueOf(pass);
-                Security.password(userField.getText(), password);
+                try {
+                    Security.password(userField.getText(), Security.encode(String.valueOf(pass)));
+                } catch (NoSuchAlgorithmException e1) {
+                    e1.printStackTrace();
+                }
                 //Checks for valid input
                 if(incorrect==true){
                     incorrectJLabel.setText("Incorrect username or password!");
