@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.awt.*;
 
-public class GUI {
+class GUIDefinitions{
     // Public variables with static variables that can be accessed globally.
     public static FileRW fileUser = new FileRW();
     public static FileRW filePass = new FileRW();
@@ -19,36 +19,39 @@ public class GUI {
     static boolean incorrect = false;
 
     // GUI Frame and panels
-    JFrame window = new JFrame("Digital Payment Services");
+    static JFrame window = new JFrame("Digital Payment Services");
     JPanel login = new JPanel();
     JPanel banking = new JPanel();
     JPanel transfer = new JPanel();
 
     // Login panel elements
-    JLabel username = new JLabel("<html><p style: font-family:'Arial'; font-size: 14;>Username</p>");
-    JLabel password = new JLabel("<html><p style: font-family:'Arial'; font-size: 14;>Password</p>");
-    JLabel incorrectJLabel = new JLabel();
-    JTextField userField = new JTextField();
-    JPasswordField passField = new JPasswordField();
-    JButton loginButton = new JButton("Login");
-    JButton registerButton = new JButton("Register");
+    static JLabel username = new JLabel("<html><p style: font-family:'Arial'; font-size: 14;>Username</p>");
+    static JLabel password = new JLabel("<html><p style: font-family:'Arial'; font-size: 14;>Password</p>");
+    static JLabel incorrectJLabel = new JLabel();
+    static JTextField userField = new JTextField();
+    static JPasswordField passField = new JPasswordField();
+    static JButton loginButton = new JButton("Login");
+    static JButton registerButton = new JButton("Register");
+    static JCheckBox showPass = new JCheckBox("Show Password");
 
     // Banking panel elements
-    JTextField amountField = new JTextField();
-    JButton deposit = new JButton("Deposit");
-    JButton withdraw = new JButton("Withdraw");
-    JButton send = new JButton("Transfer Money");
-    JButton logout = new JButton("Logout");
-    JLabel amount = new JLabel("$");
-    JLabel balanceLabel = new JLabel("Balance: $0");
-    JLabel warnings = new JLabel();
-    JLabel userId = new JLabel("User ID: ");
+    static JTextField amountField = new JTextField();
+    static JButton deposit = new JButton("Deposit");
+    static JButton withdraw = new JButton("Withdraw");
+    static JButton send = new JButton("Transfer Money");
+    static JButton logout = new JButton("Logout");
+    static JLabel amount = new JLabel("$");
+    static JLabel balanceLabel = new JLabel("Balance: $0");
+    static JLabel warnings = new JLabel();
+    static JLabel userId = new JLabel("User ID: ");
 
     // Transfer panel elements
-    JTextField idField = new JTextField();
-    JButton sendFunds = new JButton("Transfer");
-    JLabel userIdLabel = new JLabel("User ID: ");
+    static JTextField idField = new JTextField();
+    static JButton sendFunds = new JButton("Transfer");
+    static JLabel userIdLabel = new JLabel("User ID: ");
+}
 
+public class GUI extends GUIDefinitions{
     void frame() {
         // Initialization events
         int centerX = 400;
@@ -60,6 +63,7 @@ public class GUI {
         password.setBounds(centerX / 2 - 280 / 2, 130, 280, 25);
         userField.setBounds(centerX / 2 - 280 / 2, 100, 280, 25);
         passField.setBounds(centerX / 2 - 280 / 2, 155, 280, 25);
+        showPass.setBounds(centerX / 2 - 280 / 2, 183, 280, 25);
         loginButton.setBounds(centerX / 2 - 130 / 2 - 75, 250, 130, 60);
         registerButton.setBounds(centerX / 2 - 130 / 2 + 75, 250, 130, 60);
 
@@ -71,6 +75,7 @@ public class GUI {
         login.add(userField);
         login.add(loginButton);
         login.add(passField);
+        login.add(showPass);
         login.add(registerButton);
         login.add(incorrectJLabel);
         loginButton.setMnemonic(KeyEvent.VK_ENTER);
@@ -129,6 +134,10 @@ public class GUI {
         registerButton.setForeground(new Color(255, 255, 255));
         registerButton.setBackground(new Color(83, 211, 209));
         registerButton.setBorder(BorderFactory.createEmptyBorder());
+        showPass.setBorder(BorderFactory.createEmptyBorder());
+        showPass.setForeground(new Color(0, 0, 0));
+        showPass.setBackground(new Color(255, 255, 255));
+        showPass.setFont(new Font("Serif", Font.PLAIN, 12));
         deposit.setFont(new Font("Arial", Font.BOLD, 15));
         deposit.setForeground(new Color(255, 255, 255));
         deposit.setBackground(new Color(83, 211, 209));
@@ -161,7 +170,18 @@ public class GUI {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Button event listeners
-        registerButton.addActionListener(new ActionListener() {
+        showPass.addItemListener(new ItemListener(){
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange() == 1){
+                    passField.setEchoChar((char)0);
+                }
+                else{
+                    passField.setEchoChar('•');
+                }
+            }
+        });
+        registerButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 fileUser.read(fileUser.userList);
                 if (Security.updateIndex(userField.getText()) == false) {
@@ -182,7 +202,7 @@ public class GUI {
             }
         });
         loginButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e){
                 // Reads the list of usernames and passwords to be compared by
                 // Security.password();
                 char[] pass = passField.getPassword();
@@ -198,6 +218,8 @@ public class GUI {
                 //Validates if user is logged in before updating the window to show banking information
                 else if(isLoggedIn==true){
                     global.balance = "./balances/balance"+Security.userIndex+".txt";
+                    userField.setText("");
+                    passField.setText("");
                     try{
                         UpdateStats.refreshBalance();
                         global.read(global.balance);
@@ -225,12 +247,12 @@ public class GUI {
         });
         deposit.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                updateBalance(Security.userIndex, "Deposit");
+                UpdateStats.updateBalance(Security.userIndex, "Deposit");
             }
         });
         withdraw.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                updateBalance(Security.userIndex, "Withdraw");
+                UpdateStats.updateBalance(Security.userIndex, "Withdraw");
             }
         });
         send.addActionListener(new ActionListener(){
@@ -286,67 +308,26 @@ public class GUI {
         sendFunds.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 try{
-                    int id = Integer.parseInt(idField.getText());
-                    warnings.setText("");
-                    updateBalance(id, "Transfer");
+                    if(Integer.parseInt(idField.getText()) != Security.userIndex){
+                        int id = Integer.parseInt(idField.getText());
+                        warnings.setText("");
+                        UpdateStats.updateBalance(id, "Transfer");
+                    }
+                    else{
+                        warnings.setText("Error: You cannot transfer money to yourself.");
+                    }
                 }
                 catch(NumberFormatException n){
                     if(idField.getText().isBlank()){
                         warnings.setText("Error: Please enter user ID to be transferred to.");
                     }
                 }
+                catch(ArrayIndexOutOfBoundsException a){
+                    warnings.setText("Error: User does not exist, please enter a valid ID.");
+                }
             }
         });
     }
     
-    //Function to update balance
-    void updateBalance(int id, String type){
-        try{
-            //Constructor creates new object so the previous data is always cleared.
-            BalanceRW transferRW = new BalanceRW();
-            transferRW.read("./balances/balance"+id+".txt");
-            //Switch statement allows to choose what should be performed
-            switch(type){
-                case "Withdraw" , "Transfer":
-                    //Checks if user has enough balance before being withdrawn or transferred to another user and if the amoount is greater than 0.
-                    if(Double.parseDouble(amountField.getText())>0 && Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
-                        String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
-                        global.write(tempBal, "./balances/balance"+id+".txt");
-                        String tempTransfer = Double.toString(Double.parseDouble(global.balanceGlobal[0]) - Double.parseDouble(amountField.getText()));
-                        global.write(tempTransfer, global.balance);
-                        UpdateStats.refreshBalance();
-                        balanceLabel.setText("Balance: $"+tempTransfer);
-                        transferRW = null; // deletes data 
-                        warnings.setText("");
-                    }
-                    else if(Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0])<=0){
-                        warnings.setText("Error: "+type+"s must be greater than $0.");
-                    }
-                    else{
-                        warnings.setText("Error: "+type+"s greater than available funds.");
-                    }
-                    break;
-                case "Deposit":
-                    //Check if the amount deposited is greater than 0.
-                    if(Double.parseDouble(amountField.getText())>0){
-                        String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
-                        global.write(tempBal, global.balance);
-                        UpdateStats.refreshBalance();
-                        balanceLabel.setText("Balance: $"+tempBal);
-                        transferRW = null; // deletes data
-                        warnings.setText("");
-                    }
-                    else{
-                        warnings.setText("Error: "+type+"s must be greater than $0.");
-                    }
-                    break;
-            }
-        }
-        //Displays error if user enters something other than a numerical value.
-        catch(NumberFormatException n){
-            warnings.setText("Error: "+type+"s must a numerical value.");
-        }
-        //Refreshes window to display updated information
-        window.repaint();
-    }
+    
 }
