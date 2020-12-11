@@ -14,36 +14,34 @@ class Security{
     public static int userIndex = 0;
 
     public static boolean updateIndex(String login) {
+        GUI.fileUser.readInfo(GUI.fileUser.userInfo);
         try {
-            for (userIndex = 0; !login.equals(GUI.fileUser.output[userIndex]); userIndex++)
-                ;
+            for (userIndex = 0; !login.equals(GUI.fileUser.info[userIndex][0]); userIndex++);
+            System.out.println(userIndex);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("User does not exist");
+            System.out.println("User does not exist"+userIndex);
             GUI.incorrect = true;
-            userIndex = 0;
             return false;
         }
     }
-
     public static void password(String login, String pass) {
-        GUI.fileUser.read(GUI.fileUser.userList);
-        GUI.filePass.read(GUI.filePass.passList);
+        GUI.fileUser.readInfo(GUI.fileUser.userInfo);
         try {
             updateIndex(login);
-            if (pass.equals(GUI.filePass.output[userIndex])) {
+            if (pass.equals(GUI.fileUser.info[userIndex][1])) {
                 GUI.isLoggedIn = true;
                 GUI.incorrect = false;
             } else {
                 GUI.incorrect = true;
                 System.out.println(pass);
             }
-        } catch (ArrayIndexOutOfBoundsException n) {
+        } 
+        catch (ArrayIndexOutOfBoundsException n) {
             updateIndex(login);
             GUI.incorrect = true;
         }
     }
-
     public static String encode(String data) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.update(data.getBytes());

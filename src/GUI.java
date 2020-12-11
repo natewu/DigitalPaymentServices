@@ -183,13 +183,11 @@ public class GUI extends GUIDefinitions{
         });
         registerButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
-                fileUser.read(fileUser.userList);
                 if (Security.updateIndex(userField.getText()) == false) {
                     // Writes the data in user and password fields to their respective files.
-                    fileUser.write(userField.getText(), fileUser.userList);
                     char[] pass = passField.getPassword();
                     try {
-                        filePass.write(Security.encode(String.valueOf(pass)), filePass.passList);
+                        filePass.write(userField.getText()+";"+Security.encode(String.valueOf(pass)), fileUser.userInfo);
                     } catch (NoSuchAlgorithmException e1) {
                         e1.printStackTrace();
                     }
@@ -201,10 +199,10 @@ public class GUI extends GUIDefinitions{
                 }
             }
         });
+        // fix default button
         loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
-                // Reads the list of usernames and passwords to be compared by
-                // Security.password();
+                // Reads the list of usernames and passwords to be compared by Security.password();
                 char[] pass = passField.getPassword();
                 try {
                     Security.password(userField.getText(), Security.encode(String.valueOf(pass)));
@@ -328,6 +326,4 @@ public class GUI extends GUIDefinitions{
             }
         });
     }
-    
-    
 }

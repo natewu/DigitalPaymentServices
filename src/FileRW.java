@@ -1,15 +1,15 @@
 package DigitalPaymentServices;
-import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
 public class FileRW implements readWrite{
     //Public variables(Accessed from each object)
     public List<String> outputList = new ArrayList<String>();
+    public List<String> tempList = new ArrayList<String>();
     public String[] output = outputList.toArray(new String[0]);
+    public String[][] info;
     public int i = 0;
-    public String userList = "./credentials.txt";
-    public String passList = "./passlist.txt";
+    public String userInfo = "./credentials.txt";
     public String balance = "./balances/balance"+Security.userIndex+".txt";
    
     // Writes a specified string to a file from a determined path
@@ -21,7 +21,6 @@ public class FileRW implements readWrite{
         } catch (IOException e) {
         }
     }
-    
     // Reads file from a path
     public void read(String path) {
         try {
@@ -35,9 +34,25 @@ public class FileRW implements readWrite{
             reader.close();
         } catch (Exception e) {
         }
+    } 
+    public void readInfo(String path){
+        try{
+            tempList.clear();
+            BufferedReader reader = new BufferedReader(new FileReader(path));
+            String temp;
+            while((temp = reader.readLine()) != null){
+                tempList.add(temp);
+            }
+            info = new String[tempList.size()][tempList.size()];
+            for(int j = 0; j<tempList.size(); j++){
+                info[j] = tempList.get(j).split(";");
+            }
+            reader.close();
+        } catch (Exception e) {
+        }
     }
 }
-class BalanceRW extends FileRW implements readWrite{
+class BalanceRW extends FileRW{
     public List<String> balanceList = new ArrayList<String>();
     public String[] balanceGlobal = balanceList.toArray(new String[0]);
     public void write(String bal, String path){
