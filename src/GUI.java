@@ -1,13 +1,19 @@
 package DigitalPaymentServices;
+
 import javax.swing.*;
 import java.awt.Color;
 import java.awt.event.*;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
+import java.text.Format;
+import java.text.NumberFormat;
 import java.util.*;
 import java.awt.*;
+import java.net.URL;
 
-class GUIDefinitions{
+//Defines all the variables and creates objects
+class GUIDefinitions {
     // Public variables with static variables that can be accessed globally.
     public static FileRW fileUser = new FileRW();
     public static FileRW filePass = new FileRW();
@@ -15,14 +21,15 @@ class GUIDefinitions{
     public String user;
     public String pass;
     public static boolean isLoggedIn = false;
-    boolean active = false;
+    static boolean active = false;
     static boolean incorrect = false;
 
     // GUI Frame and panels
     static JFrame window = new JFrame("Digital Payment Services");
-    JPanel login = new JPanel();
-    JPanel banking = new JPanel();
-    JPanel transfer = new JPanel();
+    static JPanel login = new JPanel();
+    static JPanel banking = new JPanel();
+    static JPanel transfer = new JPanel();
+    static JPanel curExchange = new JPanel();
 
     // Login panel elements
     static JLabel username = new JLabel("<html><p style: font-family:'Arial'; font-size: 14;>Username</p>");
@@ -39,11 +46,21 @@ class GUIDefinitions{
     static JButton deposit = new JButton("Deposit");
     static JButton withdraw = new JButton("Withdraw");
     static JButton send = new JButton("Transfer Money");
+    static JButton currency = new JButton("Currency Converter");
     static JButton logout = new JButton("Logout");
     static JLabel amount = new JLabel("$");
     static JLabel balanceLabel = new JLabel("Balance: $0");
     static JLabel warnings = new JLabel();
     static JLabel userId = new JLabel("User ID: ");
+
+    // Currency panel elements
+    static JButton convert = new JButton("Convert");
+    static JLabel info = new JLabel("<html>Conversion rates are updated every 60 minutes and are provided by the currencyconverterapi.com API.</html>");
+    static JLabel conversionError = new JLabel("");
+    static JTextField exchangeFrom = new JTextField();
+    static JTextField exchangeTo = new JTextField();
+    static JComboBox nativeCurrency = new JComboBox();
+    static JComboBox conversionCurrency = new JComboBox();
 
     // Transfer panel elements
     static JTextField idField = new JTextField();
@@ -51,21 +68,22 @@ class GUIDefinitions{
     static JLabel userIdLabel = new JLabel("User ID: ");
 }
 
-public class GUI extends GUIDefinitions{
-    void frame() {
+//GUI class with methods and inherits from GUIDefinitions
+public class GUI extends GUIDefinitions {
+    void frame() throws IOException {
         // Initialization events
-        int centerX = 400;
+        int centerX = 380;
         int centerY = 500;
 
         // Login Panel
-        username.setBounds(centerX / 2 - 280 / 2, 75, 280, 25);
-        incorrectJLabel.setBounds(centerX / 2 - 280 / 2, 50, 280, 25);
-        password.setBounds(centerX / 2 - 280 / 2, 130, 280, 25);
-        userField.setBounds(centerX / 2 - 280 / 2, 100, 280, 25);
-        passField.setBounds(centerX / 2 - 280 / 2, 155, 280, 25);
-        showPass.setBounds(centerX / 2 - 280 / 2, 183, 280, 25);
-        loginButton.setBounds(centerX / 2 - 130 / 2 - 75, 250, 130, 60);
-        registerButton.setBounds(centerX / 2 - 130 / 2 + 75, 250, 130, 60);
+        username.setBounds(centerX / 2 - 295 / 2, 75, 280, 25);
+        incorrectJLabel.setBounds(centerX / 2 - 295 / 2, 50, 280, 25);
+        password.setBounds(centerX / 2 - 295 / 2, 130, 280, 25);
+        userField.setBounds(centerX / 2 - 295 / 2, 100, 280, 25);
+        passField.setBounds(centerX / 2 - 295 / 2, 155, 280, 25);
+        showPass.setBounds(centerX / 2 - 295 / 2, 183, 280, 25);
+        loginButton.setBounds(centerX / 2 - 145 / 2 - 75, 250, 130, 60);
+        registerButton.setBounds(centerX / 2 - 145 / 2 + 75, 250, 130, 60);
 
         login.setBounds(0, 0, centerX, centerY);
         login.setBackground(Color.white);
@@ -82,15 +100,16 @@ public class GUI extends GUIDefinitions{
         login.setVisible(true);
 
         // Banking Panel
-        deposit.setBounds(centerX / 2 - 105 / 2 + 55, 200, 105, 50);
-        withdraw.setBounds(centerX / 2 - 105 / 2 - 55, 200, 105, 50);
-        send.setBounds(centerX / 2 - 215 / 2, 260, 215, 50);
-        logout.setBounds(centerX / 2 - 215 / 2, 330, 215, 50);
-        amountField.setBounds(centerX / 2 - 200 / 2, 100, 200, 25);
-        amount.setBounds(centerX / 2 - 200 / 2 - 25, 100, 100, 25);
-        balanceLabel.setBounds(centerX / 2 - 200 / 2, 30, 200, 25);
-        warnings.setBounds(centerX / 2 - 300 / 2, 70, 300, 25);
-        userId.setBounds(centerX / 2 - 100 / 2, 420, 100, 25);
+        deposit.setBounds(centerX / 2 - 120 / 2 + 55, 210, 105, 50);
+        withdraw.setBounds(centerX / 2 - 120 / 2 - 55, 210, 105, 50);
+        send.setBounds(centerX / 2 - 230 / 2, 270, 215, 50);
+        currency.setBounds(centerX / 2 - 230 / 2, 150, 215, 50);
+        logout.setBounds(centerX / 2 - 230 / 2, 340, 215, 50);
+        amountField.setBounds(centerX / 2 - 225 / 2, 100, 210, 25);
+        amount.setBounds(centerX / 2 - 220 / 2 - 25, 100, 100, 25);
+        balanceLabel.setBounds(centerX / 2 - 220 / 2, 30, 200, 25);
+        warnings.setBounds(centerX / 2 - 320 / 2, 70, 300, 25);
+        userId.setBounds(centerX / 2 - 110 / 2, 420, 100, 25);
 
         banking.setBounds(0, 0, centerX, centerY);
         banking.setBackground(Color.white);
@@ -99,6 +118,7 @@ public class GUI extends GUIDefinitions{
         banking.add(deposit);
         banking.add(withdraw);
         banking.add(send);
+        banking.add(currency);
         banking.add(logout);
         banking.add(amountField);
         banking.add(amount);
@@ -106,10 +126,37 @@ public class GUI extends GUIDefinitions{
         banking.add(warnings);
         banking.add(userId);
 
+        // Currency Panel
+        UpdateStats.getCurrencies();
+
+        convert.setBounds(centerX / 2 - 100 / 2, 105, 100, 25);
+        exchangeFrom.setBounds(centerX / 2 - 175, 70, 100, 25);
+        exchangeTo.setBounds(centerX / 2 + 8, 70, 100, 25);
+        nativeCurrency.setBounds(centerX / 2 - 73, 70, 70, 24);
+        conversionCurrency.setBounds(centerX / 2 + 110, 70, 70, 24);
+        info.setBounds(centerX / 2 - 300/2, 1, 300, 74);
+        conversionError.setBounds(centerX / 2 - 180/2, 130, 180, 24);
+
+        exchangeTo.setEditable(false); // prevent editing of textfield
+        //Set default selected items
+        nativeCurrency.setSelectedItem("CAD");
+        conversionCurrency.setSelectedItem("USD");
+
+        curExchange.setBackground(Color.white);
+        curExchange.setLayout(null);
+        curExchange.setVisible(true);
+        curExchange.add(info);
+        curExchange.add(conversionError);
+        curExchange.add(convert);
+        curExchange.add(exchangeFrom);
+        curExchange.add(exchangeTo);
+        curExchange.add(nativeCurrency);
+        curExchange.add(conversionCurrency);
+
         // Transfer Panel
-        idField.setBounds(centerX / 2 - 200 / 2, 155, 200, 25);
-        sendFunds.setBounds(centerX / 2 - 100 / 2, 200, 100, 50);
-        userIdLabel.setBounds(centerX / 2 - 100 / 2 - 50, 120, 100, 50);
+        idField.setBounds(centerX / 2 - 225 / 2, 155, 210, 25);
+        sendFunds.setBounds(centerX / 2 - 120 / 2, 210, 100, 50);
+        userIdLabel.setBounds(centerX / 2 - 120 / 2 - 50, 120, 100, 50);
         transfer.setBounds(0, 0, centerX, centerY);
         transfer.setBackground(Color.white);
         transfer.setLayout(null);
@@ -120,6 +167,9 @@ public class GUI extends GUIDefinitions{
         transfer.add(idField);
 
         // GUI Style
+        final Color foreground = new Color(255, 255, 255);
+        final Color background = new Color(83, 211, 209);
+
         balanceLabel.setFont(new Font("Arial", Font.BOLD, 15));
         warnings.setFont(new Font("Serif", Font.PLAIN, 12));
         warnings.setForeground(Color.RED);
@@ -127,36 +177,44 @@ public class GUI extends GUIDefinitions{
         incorrectJLabel.setFont(new Font("Serif", Font.PLAIN, 12));
         userId.setFont(new Font("Arial", Font.BOLD, 14));
         loginButton.setFont(new Font("Arial", Font.BOLD, 15));
-        loginButton.setForeground(new Color(255, 255, 255));
-        loginButton.setBackground(new Color(83, 211, 209));
+        loginButton.setForeground(foreground);
+        loginButton.setBackground(background);
         loginButton.setBorder(BorderFactory.createEmptyBorder());
         registerButton.setFont(new Font("Arial", Font.BOLD, 15));
-        registerButton.setForeground(new Color(255, 255, 255));
-        registerButton.setBackground(new Color(83, 211, 209));
+        registerButton.setForeground(foreground);
+        registerButton.setBackground(background);
         registerButton.setBorder(BorderFactory.createEmptyBorder());
         showPass.setBorder(BorderFactory.createEmptyBorder());
         showPass.setForeground(new Color(0, 0, 0));
-        showPass.setBackground(new Color(255, 255, 255));
+        showPass.setBackground(foreground);
         showPass.setFont(new Font("Serif", Font.PLAIN, 12));
         deposit.setFont(new Font("Arial", Font.BOLD, 15));
-        deposit.setForeground(new Color(255, 255, 255));
-        deposit.setBackground(new Color(83, 211, 209));
+        deposit.setForeground(foreground);
+        deposit.setBackground(background);
         deposit.setBorder(BorderFactory.createEmptyBorder());
         withdraw.setFont(new Font("Arial", Font.BOLD, 15));
-        withdraw.setForeground(new Color(255, 255, 255));
-        withdraw.setBackground(new Color(83, 211, 209));
+        withdraw.setForeground(foreground);
+        withdraw.setBackground(background);
         withdraw.setBorder(BorderFactory.createEmptyBorder());
         send.setFont(new Font("Arial", Font.BOLD, 15));
-        send.setForeground(new Color(255, 255, 255));
-        send.setBackground(new Color(83, 211, 209));
+        send.setForeground(foreground);
+        send.setBackground(background);
         send.setBorder(BorderFactory.createEmptyBorder());
+        currency.setFont(new Font("Arial", Font.BOLD, 15));
+        currency.setForeground(foreground);
+        currency.setBackground(background);
+        currency.setBorder(BorderFactory.createEmptyBorder());
+        convert.setFont(new Font("Arial", Font.BOLD, 15));
+        convert.setForeground(foreground);
+        convert.setBackground(background);
+        convert.setBorder(BorderFactory.createEmptyBorder());
         logout.setFont(new Font("Arial", Font.BOLD, 15));
-        logout.setForeground(new Color(255, 255, 255));
-        logout.setBackground(new Color(83, 211, 209));
+        logout.setForeground(foreground);
+        logout.setBackground(background);
         logout.setBorder(BorderFactory.createEmptyBorder());
         sendFunds.setFont(new Font("Arial", Font.BOLD, 15));
-        sendFunds.setForeground(new Color(255, 255, 255));
-        sendFunds.setBackground(new Color(83, 211, 209));
+        sendFunds.setForeground(foreground);
+        sendFunds.setBackground(background);
         sendFunds.setBorder(BorderFactory.createEmptyBorder());
 
         // Main Frame
@@ -170,24 +228,24 @@ public class GUI extends GUIDefinitions{
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Button event listeners
-        showPass.addItemListener(new ItemListener(){
+        showPass.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == 1){
-                    passField.setEchoChar((char)0);
-                }
-                else{
+                if (e.getStateChange() == 1) {
+                    passField.setEchoChar((char) 0);
+                } else {
                     passField.setEchoChar('•');
                 }
             }
         });
-        registerButton.addActionListener(new ActionListener(){
+        registerButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (Security.updateIndex(userField.getText()) == false) {
                     // Writes the data in user and password fields to their respective files.
                     char[] pass = passField.getPassword();
                     try {
-                        filePass.write(userField.getText()+";"+Security.encode(String.valueOf(pass)), fileUser.userInfo);
+                        filePass.write(userField.getText() + ";" + Security.encode(String.valueOf(pass)),
+                                fileUser.userInfo);
                     } catch (NoSuchAlgorithmException e1) {
                         e1.printStackTrace();
                     }
@@ -199,38 +257,39 @@ public class GUI extends GUIDefinitions{
                 }
             }
         });
-        // fix default button
         loginButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e){
-                // Reads the list of usernames and passwords to be compared by Security.password();
+            public void actionPerformed(ActionEvent e) {
+                // Reads the list of usernames and passwords to be compared by
+                // Security.password();
                 char[] pass = passField.getPassword();
                 try {
                     Security.password(userField.getText(), Security.encode(String.valueOf(pass)));
                 } catch (NoSuchAlgorithmException e1) {
                     e1.printStackTrace();
                 }
-                //Checks for valid input
-                if(incorrect==true){
+                // Checks for valid input
+                if (incorrect == true) {
                     incorrectJLabel.setText("Incorrect username or password!");
                 }
-                //Validates if user is logged in before updating the window to show banking information
-                else if(isLoggedIn==true){
-                    global.balance = "./balances/balance"+Security.userIndex+".txt";
+                // Validates if user is logged in before updating the window to show banking
+                // information
+                else if (isLoggedIn == true) {
+                    global.balance = "./balances/balance" + Security.userIndex + ".txt";
                     userField.setText("");
                     passField.setText("");
-                    try{
+                    try {
                         UpdateStats.refreshBalance();
                         global.read(global.balance);
-                        balanceLabel.setText("Balance: $"+global.balanceGlobal[0]); 
-                        userId.setText("User ID: "+Security.userIndex);
+                        balanceLabel.setText("Balance: $" + global.balanceGlobal[0]);
+                        userId.setText("User ID: " + Security.userIndex);
                     }
-                    //If user is newly registered, creates a file to store the user balance
-                    catch(ArrayIndexOutOfBoundsException E){
+                    // If user is newly registered, creates a file to store the user balance
+                    catch (ArrayIndexOutOfBoundsException E) {
                         global.write("0", global.balance);
                         UpdateStats.refreshBalance();
                         global.read(global.balance);
-                        balanceLabel.setText("Balance: $"+global.balanceGlobal[0]); 
-                        userId.setText("User ID: "+Security.userIndex);
+                        balanceLabel.setText("Balance: $" + global.balanceGlobal[0]);
+                        userId.setText("User ID: " + Security.userIndex);
                         window.repaint();
                     }
                     warnings.setText("");
@@ -240,23 +299,24 @@ public class GUI extends GUIDefinitions{
                     window.repaint();
                     window.add(banking);
                     window.validate();
-                } 
+                }
             }
         });
-        deposit.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
+        deposit.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 UpdateStats.updateBalance(Security.userIndex, "Deposit");
             }
         });
-        withdraw.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
+        withdraw.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 UpdateStats.updateBalance(Security.userIndex, "Withdraw");
             }
         });
-        send.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
-                //Switches between the banking and transfer panel, send(JButton) is a toggle, uses boolean to check toggle state
-                if(active==false){
+        send.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Switches between the banking and transfer panel, send(JButton) is a toggle,
+                // uses boolean to check toggle state
+                if (active == false) {
                     window.remove(banking);
                     window.repaint();
                     transfer.add(send);
@@ -267,12 +327,11 @@ public class GUI extends GUIDefinitions{
                     transfer.add(userId);
                     amountField.setText("");
                     send.setText("Back");
-                    send.setBounds(centerX/2 - 100/2,260,100,50);
+                    send.setBounds(centerX / 2 - 120 / 2, 270, 100, 50);
                     window.add(transfer);
                     window.validate();
                     active = true;
-                }
-                else if(active == true){
+                } else if (active == true) {
                     window.remove(transfer);
                     window.repaint();
                     banking.add(send);
@@ -283,10 +342,40 @@ public class GUI extends GUIDefinitions{
                     banking.add(userId);
                     amountField.setText("");
                     send.setText("Transfer Money");
-                    send.setBounds(centerX/2 - 215/2,260,215,50);
+                    send.setBounds(centerX / 2 - 230 / 2, 270, 215, 50);
                     window.add(banking);
                     window.validate();
                     active = false;
+                }
+            }
+        });
+        currency.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JDialog box = new JDialog();
+
+                box.setSize(400, 200);
+                box.setTitle("Currency Conversion");
+                box.add(curExchange);
+                box.setResizable(false);
+                box.setLocationRelativeTo(null);
+                box.setVisible(true);
+            }
+        });
+        convert.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                NumberFormat format = new DecimalFormat("#0.00");
+                try {
+                    exchangeTo.setText(String.valueOf(format.format(Double.parseDouble(exchangeFrom.getText()) * UpdateStats.convert(nativeCurrency.getSelectedItem().toString().trim(), conversionCurrency.getSelectedItem().toString().trim()))));
+                    conversionError.setBounds(centerX / 2 - 170/2, 130, 170, 24);
+                    conversionError.setText("Rate: 1 "+nativeCurrency.getSelectedItem().toString()+" = "+String.valueOf(format.format(UpdateStats.convert(nativeCurrency.getSelectedItem().toString().trim(), conversionCurrency.getSelectedItem().toString().trim())))+" "+conversionCurrency.getSelectedItem().toString());
+                } 
+                catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                catch(NumberFormatException e2){
+                    //set warning label
+                    conversionError.setBounds(centerX / 2 - 180/2, 130, 180, 24);
+                    conversionError.setText("Please input a numerical value.");
                 }
             }
         });
@@ -299,6 +388,7 @@ public class GUI extends GUIDefinitions{
                 global = null;
                 global = new BalanceRW();
                 window.add(login);
+                window.getRootPane().setDefaultButton(loginButton);
                 window.validate();
             }
         });

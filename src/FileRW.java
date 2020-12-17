@@ -19,6 +19,7 @@ public class FileRW implements readWrite{
             write.write(x + System.getProperty("line.separator"));
             write.close();
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
     // Reads file from a path
@@ -33,6 +34,7 @@ public class FileRW implements readWrite{
             output = outputList.toArray(new String[0]);
             reader.close();
         } catch (Exception e) {
+            e.printStackTrace();
         }
     } 
     public void readInfo(String path){
