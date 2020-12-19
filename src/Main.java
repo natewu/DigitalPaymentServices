@@ -94,11 +94,13 @@ class UpdateStats extends GUI {
                     // Checks if user has enough balance before being withdrawn or transferred to
                     // another user and if the amoount is greater than 0.
                     if (Double.parseDouble(amountField.getText()) > 0 && Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0]) <= 0) {
+                        //Temporary balance to add amount to withdraw/transfer amount
                         String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
-                        global.write(tempBal, "./balances/balance" + id + ".txt");
+                        global.write(tempBal, "./balances/balance" + id + ".txt"); // Write to balance file
+                        //Subtract funds
                         String tempTransfer = Double.toString(Double.parseDouble(global.balanceGlobal[0]) - Double.parseDouble(amountField.getText()));
                         global.write(tempTransfer, global.balance);
-                        UpdateStats.refreshBalance();
+                        UpdateStats.refreshBalance(); // Update balance
                         balanceLabel.setText("Balance: $" + tempTransfer);
                         transferRW = null; // deletes data
                         warnings.setText("");
@@ -114,10 +116,10 @@ class UpdateStats extends GUI {
                 case "Deposit":
                     // Check if the amount deposited is greater than 0.
                     if (Double.parseDouble(amountField.getText()) > 0) {
-                        String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0])
-                                + Double.parseDouble(amountField.getText()));
-                        global.write(tempBal, global.balance);
-                        UpdateStats.refreshBalance();
+                        //Temporary balance to add amount to deposit amount
+                        String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
+                        global.write(tempBal, global.balance); // Writes to balance file
+                        UpdateStats.refreshBalance(); //Update balancec
                         balanceLabel.setText("Balance: $" + tempBal);
                         transferRW = null; // deletes data
                         warnings.setText("");

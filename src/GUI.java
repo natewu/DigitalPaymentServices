@@ -74,6 +74,8 @@ public class GUI extends GUIDefinitions {
         int centerX = 380;
         int centerY = 500;
 
+        //GUI design should be self explanetory, centerX and centerY help center the elements
+
         // Login Panel
         username.setBounds(centerX / 2 - 295 / 2, 75, 280, 25);
         incorrectJLabel.setBounds(centerX / 2 - 295 / 2, 50, 280, 25);
@@ -169,6 +171,7 @@ public class GUI extends GUIDefinitions {
         final Color foreground = new Color(255, 255, 255); //variable for colors so its more efficient for cases that involve changing colors.
         final Color background = new Color(83, 211, 209);
 
+        //GUI design styling(makes it look more modern)
         balanceLabel.setFont(new Font("Arial", Font.BOLD, 15));
         warnings.setFont(new Font("Serif", Font.PLAIN, 12));
         warnings.setForeground(Color.RED);
@@ -417,6 +420,7 @@ public class GUI extends GUIDefinitions {
         sendFunds.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 try{
+                    //Makes sure user is not sending funds to themselves
                     if(Integer.parseInt(idField.getText()) != Security.userIndex){
                         int id = Integer.parseInt(idField.getText());
                         warnings.setText("");
@@ -426,6 +430,7 @@ public class GUI extends GUIDefinitions {
                         warnings.setText("Error: You cannot transfer money to yourself.");
                     }
                 }
+                //Catches exceptions and display error to user to let them know what they can or can't do
                 catch(NumberFormatException n){
                     if(idField.getText().isBlank()){
                         warnings.setText("Error: Please enter user ID to be transferred to.");
