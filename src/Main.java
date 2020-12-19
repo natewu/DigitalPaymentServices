@@ -119,7 +119,7 @@ class UpdateStats extends GUI {
                         //Temporary balance to add amount to deposit amount
                         String tempBal = Double.toString(Double.parseDouble(transferRW.balanceGlobal[0]) + Double.parseDouble(amountField.getText()));
                         global.write(tempBal, global.balance); // Writes to balance file
-                        UpdateStats.refreshBalance(); //Update balancec
+                        UpdateStats.refreshBalance(); //Update balance
                         balanceLabel.setText("Balance: $" + tempBal);
                         transferRW = null; // deletes data
                         warnings.setText("");
