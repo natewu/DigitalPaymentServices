@@ -10,7 +10,6 @@ import java.text.Format;
 import java.text.NumberFormat;
 import java.util.*;
 import java.awt.*;
-import java.net.URL;
 
 //Defines all the variables and creates objects
 class GUIDefinitions {
@@ -59,8 +58,8 @@ class GUIDefinitions {
     static JLabel conversionError = new JLabel("");
     static JTextField exchangeFrom = new JTextField();
     static JTextField exchangeTo = new JTextField();
-    static JComboBox nativeCurrency = new JComboBox();
-    static JComboBox conversionCurrency = new JComboBox();
+    static JComboBox<String> nativeCurrency = new JComboBox();
+    static JComboBox<String> conversionCurrency = new JComboBox();
 
     // Transfer panel elements
     static JTextField idField = new JTextField();
@@ -140,7 +139,7 @@ public class GUI extends GUIDefinitions {
         exchangeTo.setEditable(false); // prevent editing of textfield
         //Set default selected items
         nativeCurrency.setSelectedItem("CAD");
-        conversionCurrency.setSelectedItem("USD");
+        conversionCurrency.setSelectedItem("EUR");
 
         curExchange.setBackground(Color.white);
         curExchange.setLayout(null);
@@ -167,7 +166,7 @@ public class GUI extends GUIDefinitions {
         transfer.add(idField);
 
         // GUI Style
-        final Color foreground = new Color(255, 255, 255);
+        final Color foreground = new Color(255, 255, 255); //variable for colors so its more efficient for cases that involve changing colors.
         final Color background = new Color(83, 211, 209);
 
         balanceLabel.setFont(new Font("Arial", Font.BOLD, 15));
@@ -222,37 +221,44 @@ public class GUI extends GUIDefinitions {
         window.setLocationRelativeTo(null);
         window.setLayout(null);
         window.add(login);
-        window.getRootPane().setDefaultButton(loginButton);
+        window.getRootPane().setDefaultButton(loginButton); //Default "enter" key action will map to the log in button
         window.setResizable(false);
         window.setVisible(true);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Button event listeners
         showPass.addItemListener(new ItemListener() {
-            @Override
+            //Checks the state change of the showPass checkbox
             public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == 1) {
+                if (e.getStateChange() == 1) { //Selected, shows raw values
                     passField.setEchoChar((char) 0);
-                } else {
+                } 
+                else { //Not selected, masks values with "•" unicode character
                     passField.setEchoChar('•');
                 }
             }
         });
         registerButton.addActionListener(new ActionListener() {
+            //Checks if registerButton has been pressed
             public void actionPerformed(ActionEvent e) {
+                //Checks if user already exists or not
                 if (Security.updateIndex(userField.getText()) == false) {
                     // Writes the data in user and password fields to their respective files.
                     char[] pass = passField.getPassword();
                     try {
-                        filePass.write(userField.getText() + ";" + Security.encode(String.valueOf(pass)),
-                                fileUser.userInfo);
-                    } catch (NoSuchAlgorithmException e1) {
+                        //Try to write username with separator ";" then hashed password using SHA-256 hashing algorithm
+                        filePass.write(userField.getText() + ";" + Security.encode(String.valueOf(pass)), fileUser.userInfo);
+                    } 
+                    catch (NoSuchAlgorithmException e1) {
+                        //If algorithm is not imported, catch error
                         e1.printStackTrace();
                     }
+                    //If registered, print message on GUI
                     incorrectJLabel.setText("Successfully Registered");
                     // Updates the userindex
                     Security.updateIndex(userField.getText());
                 } else {
+                    //If user already exists, print message on GUI
                     incorrectJLabel.setText("User already exists!");
                 }
             }
@@ -271,27 +277,33 @@ public class GUI extends GUIDefinitions {
                 if (incorrect == true) {
                     incorrectJLabel.setText("Incorrect username or password!");
                 }
-                // Validates if user is logged in before updating the window to show banking
-                // information
+                // Validates if user is logged in before updating the window to show banking information
                 else if (isLoggedIn == true) {
                     global.balance = "./balances/balance" + Security.userIndex + ".txt";
                     userField.setText("");
                     passField.setText("");
                     try {
+                        //Refreshes balance and reads balance from file
                         UpdateStats.refreshBalance();
                         global.read(global.balance);
+                        //Sets information to be displayed on GUI
                         balanceLabel.setText("Balance: $" + global.balanceGlobal[0]);
                         userId.setText("User ID: " + Security.userIndex);
                     }
                     // If user is newly registered, creates a file to store the user balance
                     catch (ArrayIndexOutOfBoundsException E) {
+                        //Writes new balance with $0 in funds
                         global.write("0", global.balance);
+                        //Refreshes balance
                         UpdateStats.refreshBalance();
+                        //Reads balance and updates information on GUI
                         global.read(global.balance);
                         balanceLabel.setText("Balance: $" + global.balanceGlobal[0]);
                         userId.setText("User ID: " + Security.userIndex);
+                        //Refreshes GUI
                         window.repaint();
                     }
+                    //Updates GUI
                     warnings.setText("");
                     incorrectJLabel.setText("");
                     amountField.setText("");
@@ -304,19 +316,21 @@ public class GUI extends GUIDefinitions {
         });
         deposit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                //Uses updateBalance method and option "Deposit" to write balance to file and update on screen information
                 UpdateStats.updateBalance(Security.userIndex, "Deposit");
             }
         });
         withdraw.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                //Uses updateBalance method and option "Withdraw" to write balance to file and update on screen information
                 UpdateStats.updateBalance(Security.userIndex, "Withdraw");
             }
         });
         send.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Switches between the banking and transfer panel, send(JButton) is a toggle,
-                // uses boolean to check toggle state
+                // Switches between the banking and transfer panel, send(JButton) is a toggle, uses boolean to check toggle state
                 if (active == false) {
+                    //If clicked, remove banking panel and add transfer panel
                     window.remove(banking);
                     window.repaint();
                     transfer.add(send);
@@ -331,7 +345,9 @@ public class GUI extends GUIDefinitions {
                     window.add(transfer);
                     window.validate();
                     active = true;
-                } else if (active == true) {
+                } 
+                else if (active == true) {
+                    //If clicked and already on transfer panel, remove transfer panel and add banking panel
                     window.remove(transfer);
                     window.repaint();
                     banking.add(send);
@@ -351,8 +367,10 @@ public class GUI extends GUIDefinitions {
         });
         currency.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                //Creates new dialog box popup
                 JDialog box = new JDialog();
 
+                //Adds elements to GUI
                 box.setSize(400, 200);
                 box.setTitle("Currency Conversion");
                 box.add(curExchange);
@@ -363,9 +381,12 @@ public class GUI extends GUIDefinitions {
         });
         convert.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                //Number formatter to format double to 2 decimal places(since it is currency)
                 NumberFormat format = new DecimalFormat("#0.00");
                 try {
+                    //Calls API with information from input + comboboxes
                     exchangeTo.setText(String.valueOf(format.format(Double.parseDouble(exchangeFrom.getText()) * UpdateStats.convert(nativeCurrency.getSelectedItem().toString().trim(), conversionCurrency.getSelectedItem().toString().trim()))));
+                    //Sets message on screen to display the conversion rate
                     conversionError.setBounds(centerX / 2 - 170/2, 130, 170, 24);
                     conversionError.setText("Rate: 1 "+nativeCurrency.getSelectedItem().toString()+" = "+String.valueOf(format.format(UpdateStats.convert(nativeCurrency.getSelectedItem().toString().trim(), conversionCurrency.getSelectedItem().toString().trim())))+" "+conversionCurrency.getSelectedItem().toString());
                 } 

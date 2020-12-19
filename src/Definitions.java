@@ -1,6 +1,7 @@
 package DigitalPaymentServices;
 
 interface readWrite{
-    public void write(String x, String path);
-    public void read(String path);
+    //Required methods for reading and writing files
+    void write(String x, String path);
+    void read(String path) throws Exception;
 }

@@ -56,14 +56,16 @@ class Security {
     }
 
     public static String encode(String data) throws NoSuchAlgorithmException {
+        //New MessageDigest object using SHA-256 hashing
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.update(data.getBytes());
         byte[] digest = md.digest();
         StringBuffer hash = new StringBuffer();
-
+        //Alg for hashing the data
         for (byte i : digest) {
             hash.append(String.format("%x", i));
         }
+        //Returns hashed password
         return hash.toString();
     }
 }
@@ -72,9 +74,9 @@ class Security {
 class UpdateStats extends GUI {
     static void refreshBalance() {
         try {
+            //refreshes balance by creating a new FileRW object(clears data) and setting global balance to the updated output
             FileRW updateBal = new FileRW();
             updateBal.read(GUI.global.balance);
-            // System.out.println("Balance: "+GUI.global.balanceGlobal[0]);
             GUI.global.balanceGlobal[0] = updateBal.output[0];
         } catch (Exception e) {
         }
@@ -134,9 +136,13 @@ class UpdateStats extends GUI {
     }
     //Converts currencies using free.curr.conv.com API, baseCurrency is for the native currency convertCurrency is for the currency that the native currency is being converted to.
     static double convert(String baseCurrency, String convertCurrency) throws IOException{
+        //Create URL object that contains API information and API key
         URL url = new URL("https://free.currconv.com/api/v7/convert?q="+baseCurrency+"_"+convertCurrency+"&compact=ultra&apiKey=b5fbfe9903d42cc569ba");
+        //Opens a connection to the API
         BufferedReader results = new BufferedReader(new InputStreamReader(url.openStream()));
+        //Temporary string to store values in an array
         String temp[] = results.readLine().split(":");
+        //Removes brackets from output
         for(int i = 0; i < temp.length; i++){
             if(temp[i].contains("{")){
                 temp[i]= temp[i].substring(1, temp[i].length());
@@ -145,17 +151,23 @@ class UpdateStats extends GUI {
                 temp[i]= temp[i].substring(0, temp[i].length()-1);
             }
         }
+        //Returns conversion rate retrieved from the API stored in temp array index 1(index 0 is conversion information)
         return Double.parseDouble(temp[1]);
     }
     //Retrieves ISO4217 currency codes from github user content
     static void getCurrencies() throws IOException{
+        //Creates URL object that contains information from github
         URL ISO4217 = new URL("https://gist.githubusercontent.com/netdesignr/5d55df291420117de1478314c4756675/raw/9b88efbd4d251115ed5e5e32f8c04bdc6180582f/currency_list_of_the_world_plain.text");
+        //Opens connection to the URL
         BufferedReader results = new BufferedReader(new InputStreamReader(ISO4217.openStream()));
+        //Temporary string to store each line(each currency code is on new line)
         String temp;
+        //Creates arraylist to dynamically add currency codes to the array
         List<String> currencies = new ArrayList<String>();
         while((temp = results.readLine()) != null){
             currencies.add(temp);
         }
+        //Retrieves information from arraylist(iterates the size of arraylist) and adds to JComboBox list
         for(int i = 0; i < currencies.size(); i++){
             nativeCurrency.addItem(currencies.get(i));
             conversionCurrency.addItem(currencies.get(i));
