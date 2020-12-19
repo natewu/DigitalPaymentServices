@@ -74,7 +74,7 @@ public class GUI extends GUIDefinitions {
         int centerX = 380;
         int centerY = 500;
 
-        //GUI design should be self explanetory, centerX and centerY help center the elements
+        //GUI design should be self explanatory, centerX and centerY help center the elements
 
         // Login Panel
         username.setBounds(centerX / 2 - 295 / 2, 75, 280, 25);
