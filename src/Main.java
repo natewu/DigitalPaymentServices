@@ -105,8 +105,7 @@ class UpdateStats extends GUI {
                         transferRW = null; // deletes data
                         warnings.setText("");
                     } 
-                    else if (Double.parseDouble(amountField.getText())
-                            - Double.parseDouble(global.balanceGlobal[0]) <= 0) {
+                    else if (Double.parseDouble(amountField.getText()) - Double.parseDouble(global.balanceGlobal[0]) <= 0) {
                         warnings.setText("Error: " + type + "s must be greater than $0.");
                     } 
                     else {
